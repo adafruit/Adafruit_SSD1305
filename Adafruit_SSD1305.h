@@ -25,8 +25,6 @@ All text above, and the splash screen must be included in any redistribution
 
 #include <Adafruit_GFX.h>
 
-#define swap(a, b) { uint8_t t = a; a = b; b = t; }
-
 #define BLACK 0
 #define WHITE 1
 
@@ -114,7 +112,7 @@ class Adafruit_SSD1305 : public Adafruit_GFX {
   void setBrightness(uint8_t i);
   void display();
 
-  void drawPixel(uint16_t x, uint16_t y, uint16_t color);
+  void drawPixel(int16_t x, int16_t y, uint16_t color);
 
  private:
   int8_t sid, sclk, dc, rst, cs;
