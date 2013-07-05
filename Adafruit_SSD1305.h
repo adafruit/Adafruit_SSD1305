@@ -99,9 +99,8 @@ All text above, and the splash screen must be included in any redistribution
 
 class Adafruit_SSD1305 : public Adafruit_GFX {
  public:
-  Adafruit_SSD1305(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST, int8_t CS) :sid(SID), sclk(SCLK), dc(DC), rst(RST), cs(CS) {}
-    Adafruit_SSD1305(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST) :sid(SID), sclk(SCLK), dc(DC), rst(RST), cs(-1) {}
-
+  Adafruit_SSD1305(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST, int8_t CS) : Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT), sid(SID), sclk(SCLK), dc(DC), rst(RST), cs(CS) {}
+    Adafruit_SSD1305(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST) : Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT), sid(SID), sclk(SCLK), dc(DC), rst(RST), cs(-1) {}
 
   void begin(void);
   void command(uint8_t c);
