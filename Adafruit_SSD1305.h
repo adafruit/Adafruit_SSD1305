@@ -64,7 +64,7 @@ All text above, and the splash screen must be included in any redistribution
   #define SSD1305_LCDHEIGHT                 32
 #endif
 
-#define SSD1306_I2C_ADDRESS   0x3C	// 011110+SA0+RW - 0x3C or 0x3D
+#define SSD1305_I2C_ADDRESS   0x3C	// 011110+SA0+RW - 0x3C or 0x3D
 
 #define SSD1305_SETLOWCOLUMN 0x00
 #define SSD1305_SETHIGHCOLUMN 0x10
@@ -103,6 +103,7 @@ All text above, and the splash screen must be included in any redistribution
 
 class Adafruit_SSD1305 : public Adafruit_GFX {
  public:
+
  Adafruit_SSD1305(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST, int8_t CS) :sid(SID), sclk(SCLK), dc(DC), rst(RST), cs(CS), Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT) {}
 
  Adafruit_SSD1305(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST) :sid(SID), sclk(SCLK), dc(DC), rst(RST), cs(-1), Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT) {}
@@ -112,7 +113,7 @@ class Adafruit_SSD1305 : public Adafruit_GFX {
  Adafruit_SSD1305(int8_t RST) :sid(-1), sclk(-1), dc(-1), rst(RST), cs(-1), Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT) {}
   
   
-  void begin(uint8_t i2caddr = SSD1306_I2C_ADDRESS);
+  void begin(uint8_t i2caddr = SSD1305_I2C_ADDRESS);
   void command(uint8_t c);
   void data(uint8_t c);
 
