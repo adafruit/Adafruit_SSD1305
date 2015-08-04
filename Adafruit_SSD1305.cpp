@@ -16,18 +16,32 @@ BSD license, check license.txt for more information
 All text above, and the splash screen below must be included in any redistribution
 *********************************************************************/
 
-//#include <Wire.h>
-#include <avr/pgmspace.h>
-#include <util/delay.h>
-#include <stdlib.h>
+#ifdef __AVR__
+ #include <avr/pgmspace.h>
+ #include <util/delay.h>
+#elif defined(ESP8266)
+ #include <pgmspace.h>
+#else
+ #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+#endif
 
+#include <stdlib.h>
+#include <Wire.h>
+#include <SPI.h>
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1305.h"
 
 #include "glcdfont.c"
 
+#ifdef SPI_HAS_TRANSACTION
+SPISettings oledspi = SPISettings(4000000, MSBFIRST, SPI_MODE0);
+#else
+#define ADAFRUIT_SSD1305_SPI SPI_CLOCK_DIV2
+#endif
+
+
 // a 5x7 font table
-extern uint8_t PROGMEM font[];
+extern const uint8_t PROGMEM font[];
 
 // the memory buffer for the LCD
 
@@ -103,14 +117,14 @@ static uint8_t buffer[SSD1305_LCDHEIGHT * SSD1305_LCDWIDTH / 8] = {
 
 
 // the most basic function, set a single pixel
-void Adafruit_SSD1305::drawPixel(uint16_t x, uint16_t y, uint16_t color) {
-  if ((x >= width()) || (y >= height()))
+void Adafruit_SSD1305::drawPixel(int16_t x, int16_t y, uint16_t color) {
+  if ((x >= width()) || (y >= height()) || (x < 0) || (y < 0))
     return;
 
   // check rotation, move pixel around if necessary
   switch (getRotation()) {
   case 1:
-    swap(x, y);
+    adagfx_swap(x, y);
     x = WIDTH - x - 1;
     break;
   case 2:
@@ -118,7 +132,7 @@ void Adafruit_SSD1305::drawPixel(uint16_t x, uint16_t y, uint16_t color) {
     y = HEIGHT - y - 1;
     break;
   case 3:
-    swap(x, y);
+    adagfx_swap(x, y);
     y = HEIGHT - y - 1;
     break;
   }  
@@ -130,34 +144,45 @@ void Adafruit_SSD1305::drawPixel(uint16_t x, uint16_t y, uint16_t color) {
     buffer[x+ (y/8)*SSD1305_LCDWIDTH] &= ~_BV((y%8)); 
 }
 
-void Adafruit_SSD1305::begin(void) {
-  constructor(128, 32);
+void Adafruit_SSD1305::begin(uint8_t i2caddr) {
+  _i2caddr = i2caddr;
 
   // set pin directions
-  pinMode(sid, OUTPUT);
-  pinMode(sclk, OUTPUT);
-  pinMode(dc, OUTPUT);
-  pinMode(rst, OUTPUT);
-  pinMode(cs, OUTPUT);
+  if (sclk != -1) {
+    pinMode(sid, OUTPUT);
+    pinMode(sclk, OUTPUT);
+#ifdef __AVR__
+    clkport     = portOutputRegister(digitalPinToPort(sclk));
+    clkpinmask  = digitalPinToBitMask(sclk);
+    mosiport    = portOutputRegister(digitalPinToPort(sid));
+    mosipinmask = digitalPinToBitMask(sid);
+#endif
+  } else if (cs != -1) {
+    // hardware SPI
+    SPI.begin();
+  } else {
+    // I2C
+    Wire.begin();
+  }
 
-  clkport     = portOutputRegister(digitalPinToPort(sclk));
-  clkpinmask  = digitalPinToBitMask(sclk);
-  mosiport    = portOutputRegister(digitalPinToPort(sid));
-  mosipinmask = digitalPinToBitMask(sid);
-  csport    = portOutputRegister(digitalPinToPort(cs));
-  cspinmask = digitalPinToBitMask(cs);
-  dcport    = portOutputRegister(digitalPinToPort(dc));
-  dcpinmask = digitalPinToBitMask(dc);
-
-  digitalWrite(rst, HIGH);
-  // VDD (3.3V) goes high at start, lets just chill for a ms
-  delay(1);
-  // bring reset low
-  digitalWrite(rst, LOW);
-  // wait 10ms
-  delay(10);
-  // bring out of reset
-  digitalWrite(rst, HIGH);
+  if (cs != -1) {
+    pinMode(dc, OUTPUT);
+    pinMode(cs, OUTPUT);
+  }
+  
+  if (rst != -1) {
+    pinMode(rst, OUTPUT);
+    
+    digitalWrite(rst, HIGH);
+    // VDD (3.3V) goes high at start, lets just chill for a ms
+    delay(1);
+    // bring reset low
+    digitalWrite(rst, LOW);
+    // wait 10ms
+    delay(10);
+    // bring out of reset
+    digitalWrite(rst, HIGH);
+  }
 
   command(SSD1305_DISPLAYOFF);                    // 0xAE
   command(SSD1305_SETLOWCOLUMN | 0x0);  // low col = 0
@@ -204,27 +229,70 @@ void Adafruit_SSD1305::invertDisplay(uint8_t i) {
 }
 
 void Adafruit_SSD1305::command(uint8_t c) { 
-  //digitalWrite(cs, HIGH);
-  *csport |= cspinmask;
-  //digitalWrite(dc, LOW);
-  *dcport &= ~dcpinmask;
-  //digitalWrite(cs, LOW);
-  *csport &= ~cspinmask;
-  fastSPIwrite(c);
-  //digitalWrite(cs, HIGH);
-  *csport |= cspinmask;
+
+  if (cs != -1) {
+    // SPI of sorts
+
+    digitalWrite(cs, HIGH);
+    digitalWrite(dc, LOW);
+    delay(1);
+    if (sclk == -1) {
+#ifdef SPI_HAS_TRANSACTION
+      SPI.beginTransaction(oledspi);
+#else
+      SPI.setDataMode(SPI_MODE0);
+      SPI.setClockDivider(ADAFRUIT_SSD1305_SPI);
+#endif
+    } 
+    digitalWrite(cs, LOW);
+    spixfer(c);
+    digitalWrite(cs, HIGH);
+
+#ifdef SPI_HAS_TRANSACTION
+    if (sclk == -1)
+      SPI.endTransaction();              // release the SPI bus
+#endif
+  } else {
+    // I2C
+    uint8_t control = 0x00;   // Co = 0, D/C = 0
+    Wire.beginTransmission(_i2caddr);
+    Wire.write(control);
+    Wire.write(c);
+    Wire.endTransmission();
+  }
 }
 
 void Adafruit_SSD1305::data(uint8_t c) {
-  //digitalWrite(cs, HIGH);
-  *csport |= cspinmask;
-  //digitalWrite(dc, HIGH);
-  *dcport |= dcpinmask;
-  //digitalWrite(cs, LOW);
-  *csport &= ~cspinmask;
-  fastSPIwrite(c);
-  //digitalWrite(cs, HIGH);
-  *csport |= cspinmask;
+  if (cs != -1) {
+    // SPI of sorts
+    digitalWrite(cs, HIGH);
+    digitalWrite(dc, HIGH);
+    
+    if (sclk == -1) {
+#ifdef SPI_HAS_TRANSACTION
+      SPI.beginTransaction(oledspi);
+#else
+      SPI.setDataMode(SPI_MODE0);
+      SPI.setClockDivider(ADAFRUIT_SSD1305_SPI);
+#endif
+    }
+    
+    digitalWrite(cs, LOW);
+    spixfer(c);
+    digitalWrite(cs, HIGH);
+    
+#ifdef SPI_HAS_TRANSACTION
+    if (sclk == -1)
+      SPI.endTransaction();              // release the SPI bus
+#endif
+  } else {
+    // I2C
+    uint8_t control = 0x40;   // Co = 0, D/C = 1
+    Wire.beginTransmission(_i2caddr);
+    Wire.write(control);
+    Wire.write(c);
+    Wire.endTransmission();
+  }  
 }
 
 void Adafruit_SSD1305::display(void) {
@@ -236,14 +304,55 @@ void Adafruit_SSD1305::display(void) {
     command(0x04);
     command(0x10);
 
-    *csport |= cspinmask;
-    *dcport |= dcpinmask;
-    *csport &= ~cspinmask;
-   
-    for(uint8_t x=0; x<128; x++)
-      fastSPIwrite(buffer[i++]);
-    
-    *csport |= cspinmask;
+    if (cs == -1) {
+      // save I2C bitrate
+#ifndef __SAM3X8E__
+      uint8_t twbrbackup = TWBR;
+      TWBR = 12; // upgrade to 400KHz!
+#endif
+      
+      //Serial.println(TWBR, DEC);
+      //Serial.println(TWSR & 0x3, DEC);
+      
+      // I2C has max 16 bytes per xmision
+      // send a bunch of data in one xmission
+      for (uint8_t w=0; w<128/16; w++) {
+	Wire.beginTransmission(_i2caddr);
+	Wire.write(0x40);
+	for (uint8_t x=0; x<16; x++) {
+	  Wire.write(buffer[i++]);
+	}
+	Wire.endTransmission();
+      }
+
+#ifndef __SAM3X8E__
+      TWBR = twbrbackup;
+#endif
+    } else {
+      // SPI
+      if (sclk == -1) {
+#ifdef SPI_HAS_TRANSACTION
+	SPI.beginTransaction(oledspi);
+#else
+	SPI.setDataMode(SPI_MODE0);
+	SPI.setClockDivider(ADAFRUIT_SSD1305_SPI);
+#endif
+      }
+      
+      digitalWrite(cs, HIGH);
+      digitalWrite(dc, HIGH);
+      digitalWrite(cs, LOW);
+      
+      for(uint8_t x=0; x<128; x++) {
+	spixfer(buffer[i++]);
+      }
+      
+      digitalWrite(cs, HIGH);
+#ifdef SPI_HAS_TRANSACTION
+      if (sclk == -1)
+	SPI.endTransaction();              // release the SPI bus
+#endif
+    }
   }
 }
 
@@ -253,26 +362,25 @@ void Adafruit_SSD1305::clearDisplay(void) {
 }
 
 
-inline void Adafruit_SSD1305::fastSPIwrite(uint8_t d) {
-  
+void Adafruit_SSD1305::spixfer(uint8_t x) {
+  if (sclk == -1) {
+    SPI.transfer(x);
+    return;
+  }
+  // software spi
+  //Serial.println("Software SPI");
+
   for(uint8_t bit = 0x80; bit; bit >>= 1) {
+#if defined(AVR)
     *clkport &= ~clkpinmask;
-    if(d & bit) *mosiport |=  mosipinmask;
+    if(x & bit) *mosiport |=  mosipinmask;
     else        *mosiport &= ~mosipinmask;
     *clkport |=  clkpinmask;
+#else
+    digitalWrite(sclk, LOW);
+    if(x & bit) digitalWrite(sid, HIGH);
+    else        digitalWrite(sid, LOW);
+    digitalWrite(sclk, HIGH);
+#endif
   }
-  //*csport |= cspinmask;
 }
-
-inline void Adafruit_SSD1305::slowSPIwrite(uint8_t d) {
- for (int8_t i=7; i>=0; i--) {
-   digitalWrite(sclk, LOW);
-   if (d & _BV(i)) {
-     digitalWrite(sid, HIGH);
-   } else {
-     digitalWrite(sid, LOW);
-   }
-   digitalWrite(sclk, HIGH);
- }
-}
-
