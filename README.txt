@@ -1,10 +1,10 @@
 This is a library for our Monochrome OLEDs based on SSD1305 drivers
 
-  Pick one up today in the adafruit shop!
-  ------> 
+Pick one up today in the adafruit shop!
 
-These displays use SPI to communicate, 4 or 5 pins are required to  
-interface
+  * https://www.adafruit.com/products/2675
+
+These displays use I2C or SPI to communicate
 
 Adafruit invests time and resources providing this open source code, 
 please support Adafruit and open-source hardware by purchasing 
