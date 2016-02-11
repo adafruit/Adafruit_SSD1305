@@ -38,6 +38,10 @@ SPISettings oledspi = SPISettings(4000000, MSBFIRST, SPI_MODE0);
 #define ADAFRUIT_SSD1305_SPI SPI_CLOCK_DIV2
 #endif
 
+#ifndef _BV
+#define _BV(x) (1 << (x))
+#endif
+
 
 // a 5x7 font table
 extern const uint8_t PROGMEM font[];
@@ -77,8 +81,8 @@ static uint8_t buffer[SSD1305_LCDHEIGHT * SSD1305_LCDWIDTH / 8] = {
 0x00, 0xC0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0xE0, 0xE0, 0xE0, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xF8, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD,
 #if (SSD1305_LCDHEIGHT == 64)
+0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xF8, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD,
 0xFE, 0xFF, 0xFF, 0x3F, 0xFF, 0xFF, 0xFF, 0xFC, 0xF3, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD, 0xF1,
 0xC1, 0x01, 0x00, 0x00, 0x70, 0x78, 0x7C, 0x7C, 0x3C, 0x3C, 0x3C, 0x3C, 0x3C, 0xFC, 0xFC, 0xF8,
 0xF0, 0x00, 0x00, 0xF0, 0xF8, 0xFC, 0xFC, 0x3C, 0x3C, 0x3C, 0x3C, 0x78, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -183,55 +187,22 @@ void Adafruit_SSD1305::begin(uint8_t i2caddr) {
     digitalWrite(rst, HIGH);
   }
 
+
+  command(SSD1305_DISPLAYOFF);                    // 0xAE
 #if defined SSD1306_128_32
-  // Init sequence for 128x32 OLED module
-  command(SSD1305_DISPLAYOFF);                    // 0xAE
-  command(SSD1305_SETLOWCOLUMN | 0x0);  // low col = 0
-  command(SSD1305_SETHIGHCOLUMN | 0x0);  // hi col = 0
-  command(SSD1305_SETSTARTLINE | 0x0); // line #0
-  command(0x2E); //??
-  command(SSD1305_SETCONTRAST);                   // 0x81
-  command(0x32);
-  command(SSD1305_SETBRIGHTNESS);                 // 0x82
-  command(0x80);
-  command(SSD1305_SEGREMAP | 0x01);
-  command(SSD1305_NORMALDISPLAY);                 // 0xA6
-  command(SSD1305_SETMULTIPLEX);                  // 0xA8
-  command(0x3F); // 1/64
-  command(SSD1305_MASTERCONFIG);
-  command(0x8e); /* external vcc supply */
-  command(SSD1305_COMSCANDEC);
-  command(SSD1305_SETDISPLAYOFFSET);              // 0xD3
-  command(0x40); 
-  command(SSD1305_SETDISPLAYCLOCKDIV);            // 0xD5
-  command(0xf0); 
-  command(SSD1305_SETAREACOLOR);  
-  command(0x05);
-  command(SSD1305_SETPRECHARGE);                  // 0xd9
-  command(0xF1);
-  command(SSD1305_SETCOMPINS);                    // 0xDA
-  command(0x12);
-
-  command(SSD1305_SETLUT);
-  command(0x3F);
-  command(0x3F);
-  command(0x3F);
-  command(0x3F);
-
-  #endif
-
-  #if defined SSD1305_128_64
-  // Init sequence for 128x64 OLED module
-  command(SSD1305_DISPLAYOFF);                    // 0xAE
+  command(SSD1305_SETLOWCOLUMN | 0x0);  // low col = 0  (Was 0x0)
+  command(SSD1305_SETHIGHCOLUMN | 0x0);  // hi col = 0  (Was 0X0)
+#else
   command(SSD1305_SETLOWCOLUMN | 0x4);  // low col = 0
   command(SSD1305_SETHIGHCOLUMN | 0x4);  // hi col = 0
+#endif
   command(SSD1305_SETSTARTLINE | 0x0); // line #0
   command(0x2E); //??
   command(SSD1305_SETCONTRAST);                   // 0x81
   command(0x32);
   command(SSD1305_SETBRIGHTNESS);                 // 0x82
   command(0x80);
-  command(SSD1305_SEGREMAP | 0x01);
+  command(SSD1305_SEGREMAP | 0x00);		  //was 0x01
   command(SSD1305_NORMALDISPLAY);                 // 0xA6
   command(SSD1305_SETMULTIPLEX);                  // 0xA8
   command(0x3F); // 1/64
@@ -241,7 +212,7 @@ void Adafruit_SSD1305::begin(uint8_t i2caddr) {
   command(SSD1305_SETDISPLAYOFFSET);              // 0xD3
   command(0x40); 
   command(SSD1305_SETDISPLAYCLOCKDIV);            // 0xD5
-  command(0xf0); 
+  command(0xF0);
   command(SSD1305_SETAREACOLOR);  
   command(0x05);
   command(SSD1305_SETPRECHARGE);                  // 0xd9
@@ -254,15 +225,19 @@ void Adafruit_SSD1305::begin(uint8_t i2caddr) {
   command(0x3F);
   command(0x3F);
   command(0x3F);
-  #endif
+//  #endif
 
   command(SSD1305_DISPLAYON);//--turn on oled panel
 }
 
-void Adafruit_SSD1305::invertDisplay(uint8_t i) {
-  if (i) {
+void Adafruit_SSD1305::invertDisplay(uint8_t i)
+{
+  if (i)
+  {
     command(SSD1305_INVERTDISPLAY);
-  } else {
+  }
+  else
+  {
     command(SSD1305_NORMALDISPLAY);
   }
 }
