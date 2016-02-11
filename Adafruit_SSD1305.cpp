@@ -225,7 +225,6 @@ void Adafruit_SSD1305::begin(uint8_t i2caddr) {
   command(0x3F);
   command(0x3F);
   command(0x3F);
-//  #endif
 
   command(SSD1305_DISPLAYON);//--turn on oled panel
 }
