@@ -38,6 +38,11 @@ SPISettings oledspi = SPISettings(4000000, MSBFIRST, SPI_MODE0);
 #define ADAFRUIT_SSD1305_SPI SPI_CLOCK_DIV2
 #endif
 
+// The _BV macro is defined by in the avr libraries
+// This allows the SSD1305 to work with other architectures, like the M0
+#ifndef _BV
+#define _BV(bit) (1 << (bit))
+#endif
 
 // a 5x7 font table
 extern const uint8_t PROGMEM font[];
