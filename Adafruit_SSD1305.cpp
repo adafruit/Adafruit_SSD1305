@@ -353,7 +353,8 @@ void Adafruit_SSD1305::display(void) {
 
     if (cs == -1) {
       // save I2C bitrate
-#ifndef __SAM3X8E__
+//#ifndef __SAM3X8E__
+#ifdef __AVR__
       uint8_t twbrbackup = TWBR;
       TWBR = 12; // upgrade to 400KHz!
 #endif
@@ -372,7 +373,8 @@ void Adafruit_SSD1305::display(void) {
 	Wire.endTransmission();
       }
 
-#ifndef __SAM3X8E__
+//#ifndef __SAM3X8E__
+#ifdef __AVR__
       TWBR = twbrbackup;
 #endif
     } else {
