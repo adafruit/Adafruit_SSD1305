@@ -38,6 +38,9 @@ SPISettings oledspi = SPISettings(4000000, MSBFIRST, SPI_MODE0);
 #define ADAFRUIT_SSD1305_SPI SPI_CLOCK_DIV2
 #endif
 
+#ifndef _BV
+#define _BV(bit) (1 << (bit))
+#endif
 
 // a 5x7 font table
 extern const uint8_t PROGMEM font[];
@@ -348,7 +351,7 @@ void Adafruit_SSD1305::display(void) {
 
     if (cs == -1) {
       // save I2C bitrate
-#ifndef __SAM3X8E__
+#ifdef __AVR__
       uint8_t twbrbackup = TWBR;
       TWBR = 12; // upgrade to 400KHz!
 #endif
@@ -367,7 +370,7 @@ void Adafruit_SSD1305::display(void) {
 	Wire.endTransmission();
       }
 
-#ifndef __SAM3X8E__
+#ifdef __AVR__
       TWBR = twbrbackup;
 #endif
     } else {
