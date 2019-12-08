@@ -6,11 +6,11 @@ This is a library for our Monochrome OLEDs based on SSD1305 drivers
 
 These displays use I2C or SPI to communicate
 
-Adafruit invests time and resources providing this open source code, 
-please support Adafruit and open-source hardware by purchasing 
+Adafruit invests time and resources providing this open source code,
+please support Adafruit and open-source hardware by purchasing
 products from Adafruit!
 
-Written by Limor Fried/Ladyada  for Adafruit Industries.  
+Written by Limor Fried/Ladyada  for Adafruit Industries.
 BSD license, check license.txt for more information
 All text above, and the splash screen below must be included in any redistribution
 *********************************************************************/
@@ -47,7 +47,7 @@ extern const uint8_t PROGMEM font[];
 
 // the memory buffer for the LCD
 
-static uint8_t buffer[SSD1305_LCDHEIGHT * SSD1305_LCDWIDTH / 8] = { 
+static uint8_t buffer[SSD1305_LCDHEIGHT * SSD1305_LCDWIDTH / 8] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xC0, 0xC0, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -80,8 +80,8 @@ static uint8_t buffer[SSD1305_LCDHEIGHT * SSD1305_LCDWIDTH / 8] = {
 0x00, 0xC0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0xE0, 0xE0, 0xE0, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xF8, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD,
 #if (SSD1305_LCDHEIGHT == 64)
+0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xF8, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD,
 0xFE, 0xFF, 0xFF, 0x3F, 0xFF, 0xFF, 0xFF, 0xFC, 0xF3, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD, 0xF1,
 0xC1, 0x01, 0x00, 0x00, 0x70, 0x78, 0x7C, 0x7C, 0x3C, 0x3C, 0x3C, 0x3C, 0x3C, 0xFC, 0xFC, 0xF8,
 0xF0, 0x00, 0x00, 0xF0, 0xF8, 0xFC, 0xFC, 0x3C, 0x3C, 0x3C, 0x3C, 0x78, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -137,13 +137,13 @@ void Adafruit_SSD1305::drawPixel(int16_t x, int16_t y, uint16_t color) {
     adagfx_swap(x, y);
     y = HEIGHT - y - 1;
     break;
-  }  
+  }
 
   // x is which column
-  if (color == WHITE) 
-    buffer[x+ (y/8)*SSD1305_LCDWIDTH] |= _BV((y%8));  
+  if (color == WHITE)
+    buffer[x+ (y/8)*SSD1305_LCDWIDTH] |= _BV((y%8));
   else
-    buffer[x+ (y/8)*SSD1305_LCDWIDTH] &= ~_BV((y%8)); 
+    buffer[x+ (y/8)*SSD1305_LCDWIDTH] &= ~_BV((y%8));
 }
 
 void Adafruit_SSD1305::begin(uint8_t i2caddr) {
@@ -171,10 +171,10 @@ void Adafruit_SSD1305::begin(uint8_t i2caddr) {
     pinMode(dc, OUTPUT);
     pinMode(cs, OUTPUT);
   }
-  
+
   if (rst != -1) {
     pinMode(rst, OUTPUT);
-    
+
     digitalWrite(rst, HIGH);
     // VDD (3.3V) goes high at start, lets just chill for a ms
     delay(1);
@@ -186,50 +186,48 @@ void Adafruit_SSD1305::begin(uint8_t i2caddr) {
     digitalWrite(rst, HIGH);
   }
 
-#if defined SSD1306_128_32
+#if defined SSD1305_128_32
   // Init sequence for 128x32 OLED module
   command(SSD1305_DISPLAYOFF);                    // 0xAE
-  command(SSD1305_SETLOWCOLUMN | 0x0);  // low col = 0
-  command(SSD1305_SETHIGHCOLUMN | 0x0);  // hi col = 0
-  command(SSD1305_SETSTARTLINE | 0x0); // line #0
-  command(0x2E); //??
+  command(SSD1305_SETLOWCOLUMN | 0x0);            // low col = 0
+  command(SSD1305_SETHIGHCOLUMN | 0x0);           // hi col = 0
+  command(SSD1305_SETSTARTLINE | 0x0);            // line #0
+  command(0x2E);                                  //??
   command(SSD1305_SETCONTRAST);                   // 0x81
   command(0x32);
   command(SSD1305_SETBRIGHTNESS);                 // 0x82
-  command(0x80);
-  command(SSD1305_SEGREMAP | 0x01);
+  command(0x10);
+  command(SSD1305_SEGREMAP | 0x00);
   command(SSD1305_NORMALDISPLAY);                 // 0xA6
   command(SSD1305_SETMULTIPLEX);                  // 0xA8
-  command(0x3F); // 1/64
+  command(0x3F);                                  // 1/64
   command(SSD1305_MASTERCONFIG);
-  command(0x8e); /* external vcc supply */
+  command(0x8e);                                  /* external vcc supply */
   command(SSD1305_COMSCANDEC);
   command(SSD1305_SETDISPLAYOFFSET);              // 0xD3
-  command(0x40); 
+  command(0x40);
   command(SSD1305_SETDISPLAYCLOCKDIV);            // 0xD5
-  command(0xf0); 
-  command(SSD1305_SETAREACOLOR);  
+  command(0xf0);
+  command(SSD1305_SETAREACOLOR);
   command(0x05);
   command(SSD1305_SETPRECHARGE);                  // 0xd9
   command(0xF1);
   command(SSD1305_SETCOMPINS);                    // 0xDA
   command(0x12);
-
   command(SSD1305_SETLUT);
   command(0x3F);
   command(0x3F);
   command(0x3F);
   command(0x3F);
+#endif
 
-  #endif
-
-  #if defined SSD1305_128_64
+#if defined SSD1305_128_64
   // Init sequence for 128x64 OLED module
   command(SSD1305_DISPLAYOFF);                    // 0xAE
-  command(SSD1305_SETLOWCOLUMN | 0x4);  // low col = 0
-  command(SSD1305_SETHIGHCOLUMN | 0x4);  // hi col = 0
-  command(SSD1305_SETSTARTLINE | 0x0); // line #0
-  command(0x2E); //??
+  command(SSD1305_SETLOWCOLUMN | 0x4);            // low col = 0
+  command(SSD1305_SETHIGHCOLUMN | 0x4);           // hi col = 0
+  command(SSD1305_SETSTARTLINE | 0x0);            // line #0
+  command(0x2E);                                  //??
   command(SSD1305_SETCONTRAST);                   // 0x81
   command(0x32);
   command(SSD1305_SETBRIGHTNESS);                 // 0x82
@@ -237,27 +235,26 @@ void Adafruit_SSD1305::begin(uint8_t i2caddr) {
   command(SSD1305_SEGREMAP | 0x01);
   command(SSD1305_NORMALDISPLAY);                 // 0xA6
   command(SSD1305_SETMULTIPLEX);                  // 0xA8
-  command(0x3F); // 1/64
+  command(0x3F);                                  // 1/64
   command(SSD1305_MASTERCONFIG);
-  command(0x8e); /* external vcc supply */
+  command(0x8e);                                  /* external vcc supply */
   command(SSD1305_COMSCANDEC);
   command(SSD1305_SETDISPLAYOFFSET);              // 0xD3
-  command(0x40); 
+  command(0x40);
   command(SSD1305_SETDISPLAYCLOCKDIV);            // 0xD5
-  command(0xf0); 
-  command(SSD1305_SETAREACOLOR);  
+  command(0xf0);
+  command(SSD1305_SETAREACOLOR);
   command(0x05);
   command(SSD1305_SETPRECHARGE);                  // 0xd9
   command(0xF1);
   command(SSD1305_SETCOMPINS);                    // 0xDA
   command(0x12);
-
   command(SSD1305_SETLUT);
   command(0x3F);
   command(0x3F);
   command(0x3F);
   command(0x3F);
-  #endif
+#endif
 
   command(SSD1305_DISPLAYON);//--turn on oled panel
 }
@@ -270,8 +267,7 @@ void Adafruit_SSD1305::invertDisplay(uint8_t i) {
   }
 }
 
-void Adafruit_SSD1305::command(uint8_t c) { 
-
+void Adafruit_SSD1305::command(uint8_t c) {
   if (cs != -1) {
     // SPI of sorts
 
@@ -285,7 +281,7 @@ void Adafruit_SSD1305::command(uint8_t c) {
       SPI.setDataMode(SPI_MODE0);
       SPI.setClockDivider(ADAFRUIT_SSD1305_SPI);
 #endif
-    } 
+    }
     digitalWrite(cs, LOW);
     spixfer(c);
     digitalWrite(cs, HIGH);
@@ -309,7 +305,7 @@ void Adafruit_SSD1305::data(uint8_t c) {
     // SPI of sorts
     digitalWrite(cs, HIGH);
     digitalWrite(dc, HIGH);
-    
+
     if (sclk == -1) {
 #ifdef SPI_HAS_TRANSACTION
       SPI.beginTransaction(oledspi);
@@ -318,11 +314,11 @@ void Adafruit_SSD1305::data(uint8_t c) {
       SPI.setClockDivider(ADAFRUIT_SSD1305_SPI);
 #endif
     }
-    
+
     digitalWrite(cs, LOW);
     spixfer(c);
     digitalWrite(cs, HIGH);
-    
+
 #ifdef SPI_HAS_TRANSACTION
     if (sclk == -1)
       SPI.endTransaction();              // release the SPI bus
@@ -334,7 +330,7 @@ void Adafruit_SSD1305::data(uint8_t c) {
     Wire.write(control);
     Wire.write(c);
     Wire.endTransmission();
-  }  
+  }
 }
 
 void Adafruit_SSD1305::display(void) {
@@ -355,10 +351,10 @@ void Adafruit_SSD1305::display(void) {
       uint8_t twbrbackup = TWBR;
       TWBR = 12; // upgrade to 400KHz!
 #endif
-      
+
       //Serial.println(TWBR, DEC);
       //Serial.println(TWSR & 0x3, DEC);
-      
+
       // I2C has max 16 bytes per xmision
       // send a bunch of data in one xmission
       for (uint8_t w=0; w<128/16; w++) {
@@ -383,15 +379,15 @@ void Adafruit_SSD1305::display(void) {
 	SPI.setClockDivider(ADAFRUIT_SSD1305_SPI);
 #endif
       }
-      
+
       digitalWrite(cs, HIGH);
       digitalWrite(dc, HIGH);
       digitalWrite(cs, LOW);
-      
+
       for(uint8_t x=0; x<128; x++) {
 	spixfer(buffer[i++]);
       }
-      
+
       digitalWrite(cs, HIGH);
 #ifdef SPI_HAS_TRANSACTION
       if (sclk == -1)
@@ -405,7 +401,6 @@ void Adafruit_SSD1305::display(void) {
 void Adafruit_SSD1305::clearDisplay(void) {
   memset(buffer, 0, (SSD1305_LCDWIDTH*SSD1305_LCDHEIGHT/8));
 }
-
 
 void Adafruit_SSD1305::spixfer(uint8_t x) {
   if (sclk == -1) {
