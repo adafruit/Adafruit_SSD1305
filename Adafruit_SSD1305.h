@@ -6,11 +6,11 @@ This is a library for our Monochrome OLEDs based on SSD1305 drivers
 
 These displays use I2C or SPI to communicate
 
-Adafruit invests time and resources providing this open source code, 
-please support Adafruit and open-source hardware by purchasing 
+Adafruit invests time and resources providing this open source code,
+please support Adafruit and open-source hardware by purchasing
 products from Adafruit!
 
-Written by Limor Fried/Ladyada  for Adafruit Industries.  
+Written by Limor Fried/Ladyada  for Adafruit Industries.
 BSD license, check license.txt for more information
 All text above, and the splash screen must be included in any redistribution
 *********************************************************************/
@@ -40,7 +40,7 @@ All text above, and the splash screen must be included in any redistribution
 
     SSD1305_128_32  128x32 pixel display
 
-    You also need to set the LCDWIDTH and LCDHEIGHT defines to an 
+    You also need to set the LCDWIDTH and LCDHEIGHT defines to an
     appropriate size
 
     -----------------------------------------------------------------------*/
@@ -109,10 +109,10 @@ class Adafruit_SSD1305 : public Adafruit_GFX {
  Adafruit_SSD1305(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST) :sid(SID), sclk(SCLK), dc(DC), rst(RST), cs(-1), Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT) {}
 
  Adafruit_SSD1305(int8_t DC, int8_t RST, int8_t CS) :sid(-1), sclk(-1), dc(DC), rst(RST), cs(CS), Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT) {}
-  
+
  Adafruit_SSD1305(int8_t RST) :sid(-1), sclk(-1), dc(-1), rst(RST), cs(-1), Adafruit_GFX(SSD1305_LCDWIDTH, SSD1305_LCDHEIGHT) {}
-  
-  
+
+
   void begin(uint8_t i2caddr = SSD1305_I2C_ADDRESS);
   void command(uint8_t c);
   void data(uint8_t c);
