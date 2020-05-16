@@ -250,7 +250,7 @@ void Adafruit_SSD1305::display(void) {
   uint8_t pages = ((HEIGHT + 7) / 8);
 
   uint8_t bytes_per_page = WIDTH;
-  uint16_t maxbuff = 128;
+  uint8_t maxbuff = 128;
 
   /*
   Serial.print("Window: (");
@@ -266,8 +266,8 @@ void Adafruit_SSD1305::display(void) {
 
   uint8_t first_page = window_y1 / 8;
   uint8_t last_page = (window_y2+7) / 8;
-  uint8_t page_start = min(bytes_per_page, window_x1);
-  uint8_t page_end = max(0, window_x2);
+  uint8_t page_start = min((int16_t)bytes_per_page, window_x1);
+  uint8_t page_end = max((int16_t)0, window_x2);
   /*
   Serial.print("Pages: ");  
   Serial.print(first_page);
