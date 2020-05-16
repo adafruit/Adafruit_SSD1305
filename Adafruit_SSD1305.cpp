@@ -165,11 +165,9 @@ bool Adafruit_SSD1305::begin(uint8_t addr, bool reset) {
     return false;
   }
 
-  if (WIDTH == 64 && HEIGHT == 128) {
-    drawBitmap((HEIGHT - splash2_width) / 2, 
-	       (WIDTH - splash2_height) / 2,
-               splash2_data, splash2_width, splash2_height, 1);
-  }
+  drawBitmap((WIDTH - splash2_width) / 2, 
+	     (HEIGHT - splash2_height) / 2,
+	     splash2_data, splash2_width, splash2_height, 1);
 
   // Init sequence, make sure its under 32 bytes, or split into multiples!
   static const uint8_t init_128x32[] = {
@@ -192,6 +190,7 @@ bool Adafruit_SSD1305::begin(uint8_t addr, bool reset) {
     SSD1305_SETPRECHARGE, 0xF1,          // 0xd9, 0xF1
     SSD1305_SETCOMPINS, 0x12,            // 0xDA, 0x12
     SSD1305_SETLUT,
+    0x3F,
     0x3F,
     0x3F,
     0x3F
@@ -295,9 +294,9 @@ void Adafruit_SSD1305::display(void) {
       // cut off end of dirty rectangle
       bytes_remaining -= (WIDTH-1) - page_end;
 
-      uint8_t cmd[] = {0x00, SSD1305_SETPAGEADDR + p, 
+      uint8_t cmd[] = {0x00, SSD1305_SETPAGESTART + p, 
 		       0x10 + (page_start >> 4), page_start & 0xF};
-      i2c_dev->write(cmd, 4);
+      i2c_dev->write(cmd, sizeof(cmd));
 
       while (bytes_remaining) {
 	uint8_t to_write = min(bytes_remaining, maxbuff);
