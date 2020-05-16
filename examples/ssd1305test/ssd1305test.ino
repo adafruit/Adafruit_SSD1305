@@ -33,12 +33,12 @@ All text above, and the splash screen below must be included in any redistributi
 #define OLED_RESET 9
 
 // software SPI
-Adafruit_SSD1305 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+//Adafruit_SSD1305 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 // hardware SPI
 //Adafruit_SSD1305 display(OLED_DC, OLED_RESET, OLED_CS);
 
 // I2C
-//Adafruit_SSD1305 display(OLED_RESET);
+Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
 
 #define NUMFLAKES 10
 #define XPOS 0
@@ -66,32 +66,20 @@ static const unsigned char PROGMEM logo16_glcd_bmp[] =
   B01110000, B01110000,
   B00000000, B00110000 };
 
-void fill(unsigned char dat1,unsigned char dat2)
-{
-  unsigned char x,y;
-  for(y=0;y<8;y++)
-  {
-    display.command(0xb0+y);
-    display.command(0x00);
-    display.command(0x10);
-    for(x=0;x<132;x++)
-    {
-      display.data(dat1);
-      display.data(dat2);
-    }
-  }
-}
-
 
 void setup()   {                
   Serial.begin(9600);
+  while (! Serial) delay(100);
   Serial.println("SSD1305 OLED test");
   
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
-  display.begin();
+  if ( ! display.begin(0x3C) ) {
+     Serial.println("Unable to initialize OLED");
+     while (1) yield();
+  }
   // init done
-  
   display.display(); // show splashscreen
+
   delay(1000);
   display.clearDisplay();   // clears the screen and buffer
 

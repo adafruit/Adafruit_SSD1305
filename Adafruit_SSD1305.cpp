@@ -281,6 +281,11 @@ void Adafruit_SSD1305::display(void) {
   Serial.println(page_end);
   */
 
+  if (HEIGHT == 32) {
+    // we skip the first 4 pages
+    first_page += 4;
+  }
+
   if (i2c_dev) { // I2C
     // Set high speed clk
     i2c_dev->setSpeed(i2c_preclk);
