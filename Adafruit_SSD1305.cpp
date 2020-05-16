@@ -250,7 +250,7 @@ void Adafruit_SSD1305::display(void) {
   uint8_t pages = ((HEIGHT + 7) / 8);
 
   uint8_t bytes_per_page = WIDTH;
-  uint16_t maxbuff = i2c_dev->maxBufferSize() - 1;
+  uint16_t maxbuff = 128;
 
   /*
   Serial.print("Window: (");
@@ -289,35 +289,41 @@ void Adafruit_SSD1305::display(void) {
   if (i2c_dev) { // I2C
     // Set high speed clk
     i2c_dev->setSpeed(i2c_preclk);
-
-    for (uint8_t p=first_page; p<pages; p++) {
-      uint8_t bytes_remaining = bytes_per_page;
-      ptr = buffer + (uint16_t)p * (uint16_t)bytes_per_page;
-      // fast forward to dirty rectangle beginning
-      ptr += page_start;
-      bytes_remaining -= page_start;
-      // cut off end of dirty rectangle
-      bytes_remaining -= (WIDTH-1) - page_end;
-
-      uint8_t cmd[] = {0x00, SSD1305_SETPAGESTART + p, 
-		       0x10 + (page_start >> 4), page_start & 0xF};
-      i2c_dev->write(cmd, sizeof(cmd));
-
-      while (bytes_remaining) {
-	uint8_t to_write = min(bytes_remaining, maxbuff);
-	i2c_dev->write(ptr, to_write, true, &dc_byte, 1);
-	ptr += to_write;
-	bytes_remaining -= to_write;
-	yield();
-      }
-    }
-    // Set high speed clk
-    i2c_dev->setSpeed(i2c_postclk);
-
-  } else { // SPI
-    //SSD1305_MODE_DATA
-    //while(count--) SPIwrite(*ptr++);
+    maxbuff = i2c_dev->maxBufferSize() - 1;
   }
+
+  for (uint8_t p=first_page; p<pages; p++) {
+    uint8_t bytes_remaining = bytes_per_page;
+    ptr = buffer + (uint16_t)p * (uint16_t)bytes_per_page;
+    // fast forward to dirty rectangle beginning
+    ptr += page_start;
+    bytes_remaining -= page_start;
+    // cut off end of dirty rectangle
+    bytes_remaining -= (WIDTH-1) - page_end;
+    
+    uint8_t cmd[] = {SSD1305_SETPAGESTART + p, 
+		     0x10 + (page_start >> 4), page_start & 0xF};
+    oled_commandList(cmd, sizeof(cmd));
+    
+    while (bytes_remaining) {
+      uint8_t to_write = min(bytes_remaining, maxbuff);
+      if (i2c_dev) {
+	i2c_dev->write(ptr, to_write, true, &dc_byte, 1);
+      } else {
+	digitalWrite(dcPin, HIGH);
+	spi_dev->write(ptr, to_write);
+      }
+      ptr += to_write;
+      bytes_remaining -= to_write;
+      yield();
+    }
+  }
+
+  if (i2c_dev) { // I2C
+    // Set low speed clk
+    i2c_dev->setSpeed(i2c_postclk);
+  }
+
   // reset dirty window
   window_x1 = 1024;
   window_y1 = 1024;

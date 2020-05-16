@@ -33,12 +33,12 @@ All text above, and the splash screen below must be included in any redistributi
 #define OLED_RESET 9
 
 // software SPI
-//Adafruit_SSD1305 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+//Adafruit_SSD1305 display(128, 64, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 // hardware SPI
-//Adafruit_SSD1305 display(OLED_DC, OLED_RESET, OLED_CS);
+Adafruit_SSD1305 display(128, 64, &SPI, OLED_DC, OLED_RESET, OLED_CS);
 
 // I2C
-Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
+//Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
 
 #define NUMFLAKES 10
 #define XPOS 0
@@ -77,9 +77,9 @@ void setup()   {
      Serial.println("Unable to initialize OLED");
      while (1) yield();
   }
+
   // init done
   display.display(); // show splashscreen
-
   delay(1000);
   display.clearDisplay();   // clears the screen and buffer
 
