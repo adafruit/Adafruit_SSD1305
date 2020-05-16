@@ -59,7 +59,6 @@ redistribution
             because other devices on the I2C bus might not be compatible
             with the faster rate. (Ignored if using pre-1.5.7 Arduino
             software, which operates I2C at a fixed 100 KHz.)
-    @return Adafruit_SSD1305 object.
     @note   Call the object's begin() function before use -- buffer
             allocation is performed there!
 */
@@ -91,7 +90,6 @@ Adafruit_SSD1305::Adafruit_SSD1305(uint16_t w, uint16_t h, TwoWire *twi,
     @param  cs_pin
             Chip-select pin (using Arduino pin numbering) for sharing the
             bus with other devices. Active low.
-    @return Adafruit_SSD1305 object.
     @note   Call the object's begin() function before use -- buffer
             allocation is performed there!
 */
@@ -122,7 +120,6 @@ Adafruit_SSD1305::Adafruit_SSD1305(uint16_t w, uint16_t h, int8_t mosi_pin,
     @param  bitrate
             SPI clock rate for transfers to this display. Default if
             unspecified is 8000000UL (8 MHz).
-    @return Adafruit_SSD1305 object.
     @note   Call the object's begin() function before use -- buffer
             allocation is performed there!
 */
@@ -248,6 +245,9 @@ bool Adafruit_SSD1305::begin(uint8_t addr, bool reset) {
   return true; // Success
 }
 
+/*!
+    @brief  Do the actual writing of the internal frame buffer to display RAM
+*/
 void Adafruit_SSD1305::display(void) {
   // ESP8266 needs a periodic yield() call to avoid watchdog reset.
   // With the limited size of SSD1305 displays, and the fast bitrate

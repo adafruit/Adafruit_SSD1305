@@ -56,6 +56,7 @@ All text above, and the splash screen must be included in any redistribution
 #define SSD1305_SETCOMPINS 0xDA
 #define SSD1305_SETVCOMLEVEL 0xDB
 
+/*! The controller object for SSD1305 OLED displays */
 class Adafruit_SSD1305 : public Adafruit_MonoOLED {
 public:
   Adafruit_SSD1305(uint16_t w, uint16_t h, TwoWire *twi = &Wire,
