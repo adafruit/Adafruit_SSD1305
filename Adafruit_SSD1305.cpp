@@ -225,7 +225,7 @@ bool Adafruit_SSD1305::begin(uint8_t addr, bool reset) {
 
   if (HEIGHT == 32) {
     page_offset = 4;
-    if (!oled_commandList( init_128x32, sizeof(init_128x32))) {
+    if (!oled_commandList(init_128x32, sizeof(init_128x32))) {
       return false;
     }
   } else {
@@ -234,7 +234,7 @@ bool Adafruit_SSD1305::begin(uint8_t addr, bool reset) {
     if (!oled_commandList(init_128x64, sizeof(init_128x64))) {
       return false;
     }
- }
+  }
   delay(100);                      // 100ms delay recommended
   oled_command(SSD1305_DISPLAYON); // 0xaf
   setContrast(0x2F);
@@ -306,8 +306,8 @@ void Adafruit_SSD1305::display(void) {
     // cut off end of dirty rectangle
     bytes_remaining -= (WIDTH - 1) - page_end;
 
-    uint8_t cmd[] = {SSD1305_SETPAGESTART + p + page_offset, 0x10 + (page_start >> 4),
-                     page_start & 0xF};
+    uint8_t cmd[] = {SSD1305_SETPAGESTART + p + page_offset,
+                     0x10 + (page_start >> 4), page_start & 0xF};
     oled_commandList(cmd, sizeof(cmd));
 
     while (bytes_remaining) {
