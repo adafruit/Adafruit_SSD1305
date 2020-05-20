@@ -16,15 +16,6 @@ All text above, and the splash screen below must be included in any
 redistribution
 *********************************************************************/
 
-#ifdef __AVR__
-#include <avr/pgmspace.h>
-#include <util/delay.h>
-#elif defined(ESP8266)
-#include <pgmspace.h>
-#else
-#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-#endif
-
 #include "Adafruit_SSD1305.h"
 #include "splash.h"
 
@@ -176,7 +167,7 @@ bool Adafruit_SSD1305::begin(uint8_t addr, bool reset) {
       0x32, // 0x81, 0x32
       SSD1305_SETBRIGHTNESS,
       0x10, // 0x82, 0x10
-      SSD1305_SEGREMAP | 0x00,
+      SSD1305_SEGREMAP | 0x01,
       SSD1305_NORMALDISPLAY, // 0xA6
       SSD1305_SETMULTIPLEX,
       0x3F, // 0xA8, 0x3F (1/64)
@@ -232,12 +223,18 @@ bool Adafruit_SSD1305::begin(uint8_t addr, bool reset) {
       0x3F,
       0x3F};
 
-  if ((HEIGHT == 64) && (!oled_commandList(init_128x64, sizeof(init_128x64)))) {
-    return false;
-  } else if (HEIGHT == 32 &&
-             (!oled_commandList(init_128x32, sizeof(init_128x32)))) {
-    return false;
-  }
+  if (HEIGHT == 32) {
+    page_offset = 4;
+    if (!oled_commandList( init_128x32, sizeof(init_128x32))) {
+      return false;
+    }
+  } else {
+    // 128x64 high
+    page_offset = 0;
+    if (!oled_commandList(init_128x64, sizeof(init_128x64))) {
+      return false;
+    }
+ }
   delay(100);                      // 100ms delay recommended
   oled_command(SSD1305_DISPLAYON); // 0xaf
   setContrast(0x2F);
@@ -294,18 +291,13 @@ void Adafruit_SSD1305::display(void) {
   Serial.println(page_end);
   */
 
-  if (HEIGHT == 32) {
-    // we skip the first 4 pages
-    first_page += 4;
-  }
-
   if (i2c_dev) { // I2C
     // Set high speed clk
     i2c_dev->setSpeed(i2c_preclk);
     maxbuff = i2c_dev->maxBufferSize() - 1;
   }
 
-  for (uint8_t p = first_page; p < pages; p++) {
+  for (uint8_t p = first_page; p < last_page; p++) {
     uint8_t bytes_remaining = bytes_per_page;
     ptr = buffer + (uint16_t)p * (uint16_t)bytes_per_page;
     // fast forward to dirty rectangle beginning
@@ -314,7 +306,7 @@ void Adafruit_SSD1305::display(void) {
     // cut off end of dirty rectangle
     bytes_remaining -= (WIDTH - 1) - page_end;
 
-    uint8_t cmd[] = {SSD1305_SETPAGESTART + p, 0x10 + (page_start >> 4),
+    uint8_t cmd[] = {SSD1305_SETPAGESTART + p + page_offset, 0x10 + (page_start >> 4),
                      page_start & 0xF};
     oled_commandList(cmd, sizeof(cmd));
 
