@@ -3,7 +3,7 @@
 This is the Adafruit SSD1305 Arduino Library for Arduino
 Tested and works great with the Adafruit SSD1305 Breakout Board
 
-[<img src="assets/board.png?raw=true" width="500px">](https://www.adafruit.com/products/2675)
+[<img src="https://cdn-shop.adafruit.com/1200x900/4567-07.jpg" width="500px">](https://www.adafruit.com/?q=monochrome%20oled)
 
 These displays use I2C or SPI to communicate
 
