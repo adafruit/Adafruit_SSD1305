@@ -15,7 +15,7 @@ BSD license, check license.txt for more information
 All text above, and the splash screen must be included in any redistribution
 *********************************************************************/
 
-#include <Adafruit_MonoOLED.h>
+#include <Adafruit_GrayOLED.h>
 
 #define BLACK 0
 #define WHITE 1
@@ -57,7 +57,7 @@ All text above, and the splash screen must be included in any redistribution
 #define SSD1305_SETVCOMLEVEL 0xDB
 
 /*! The controller object for SSD1305 OLED displays */
-class Adafruit_SSD1305 : public Adafruit_MonoOLED {
+class Adafruit_SSD1305 : public Adafruit_GrayOLED {
 public:
   Adafruit_SSD1305(uint16_t w, uint16_t h, TwoWire *twi = &Wire,
                    int8_t rst_pin = -1, uint32_t preclk = 400000,

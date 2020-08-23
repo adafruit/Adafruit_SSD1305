@@ -72,7 +72,6 @@ void setup()   {
   while (! Serial) delay(100);
   Serial.println("SSD1305 OLED test");
   
-  // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   if ( ! display.begin(0x3C) ) {
      Serial.println("Unable to initialize OLED");
      while (1) yield();
