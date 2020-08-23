@@ -56,7 +56,7 @@ redistribution
 Adafruit_SSD1305::Adafruit_SSD1305(uint16_t w, uint16_t h, TwoWire *twi,
                                    int8_t rst_pin, uint32_t clkDuring,
                                    uint32_t clkAfter)
-  : Adafruit_GrayOLED(1, w, h, twi, rst_pin, clkDuring, clkAfter) {}
+    : Adafruit_GrayOLED(1, w, h, twi, rst_pin, clkDuring, clkAfter) {}
 
 /*!
     @brief  Constructor for SPI SSD1305 displays, using software (bitbang)
@@ -87,7 +87,7 @@ Adafruit_SSD1305::Adafruit_SSD1305(uint16_t w, uint16_t h, TwoWire *twi,
 Adafruit_SSD1305::Adafruit_SSD1305(uint16_t w, uint16_t h, int8_t mosi_pin,
                                    int8_t sclk_pin, int8_t dc_pin,
                                    int8_t rst_pin, int8_t cs_pin)
-  : Adafruit_GrayOLED(1, w, h, mosi_pin, sclk_pin, dc_pin, rst_pin, cs_pin) {}
+    : Adafruit_GrayOLED(1, w, h, mosi_pin, sclk_pin, dc_pin, rst_pin, cs_pin) {}
 
 /*!
     @brief  Constructor for SPI SSD1305 displays, using native hardware SPI.
@@ -117,7 +117,7 @@ Adafruit_SSD1305::Adafruit_SSD1305(uint16_t w, uint16_t h, int8_t mosi_pin,
 Adafruit_SSD1305::Adafruit_SSD1305(uint16_t w, uint16_t h, SPIClass *spi,
                                    int8_t dc_pin, int8_t rst_pin, int8_t cs_pin,
                                    uint32_t bitrate)
-  : Adafruit_GrayOLED(1, w, h, spi, dc_pin, rst_pin, cs_pin, bitrate) {}
+    : Adafruit_GrayOLED(1, w, h, spi, dc_pin, rst_pin, cs_pin, bitrate) {}
 
 /*!
     @brief  Destructor for Adafruit_SSD1305 object.
@@ -308,7 +308,8 @@ void Adafruit_SSD1305::display(void) {
     bytes_remaining -= (WIDTH - 1) - page_end;
 
     uint8_t cmd[] = {SSD1305_SETPAGESTART + p + page_offset,
-                     0x10 + ((page_start+column_offset) >> 4), (page_start+column_offset) & 0xF};
+                     0x10 + ((page_start + column_offset) >> 4),
+                     (page_start + column_offset) & 0xF};
     oled_commandList(cmd, sizeof(cmd));
 
     while (bytes_remaining) {
