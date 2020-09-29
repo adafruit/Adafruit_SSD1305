@@ -34,8 +34,8 @@ All text above, and the splash screen below must be included in any redistributi
 
 // software SPI
 //Adafruit_SSD1305 display(128, 64, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
-// hardware SPI
-Adafruit_SSD1305 display(128, 64, &SPI, OLED_DC, OLED_RESET, OLED_CS);
+// hardware SPI - use 7Mhz (7000000UL) or lower because the screen is rated for 4MHz, or it will remain blank!
+Adafruit_SSD1305 display(128, 64, &SPI, OLED_DC, OLED_RESET, OLED_CS, 7000000UL);
 
 // I2C
 //Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
