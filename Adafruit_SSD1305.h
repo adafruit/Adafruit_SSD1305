@@ -70,6 +70,8 @@ public:
 
   bool begin(uint8_t i2caddr = SSD1305_I2C_ADDRESS, bool reset = true);
   void display();
+  void sleep();
+  void wake();
 
 private:
   int8_t page_offset = 0;
