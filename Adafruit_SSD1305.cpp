@@ -307,9 +307,9 @@ void Adafruit_SSD1305::display(void) {
     // cut off end of dirty rectangle
     bytes_remaining -= (WIDTH - 1) - page_end;
 
-    uint8_t cmd[] = {SSD1305_SETPAGESTART + p + page_offset,
-                     0x10 + ((page_start + column_offset) >> 4),
-                     (page_start + column_offset) & 0xF};
+    uint8_t cmd[] = {uint8_t(SSD1305_SETPAGESTART + p + page_offset),
+                     uint8_t(0x10 + ((page_start + column_offset) >> 4)),
+                     uint8_t((page_start + column_offset) & 0xF)};
     oled_commandList(cmd, sizeof(cmd));
 
     while (bytes_remaining) {
