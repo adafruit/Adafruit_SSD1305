@@ -77,4 +77,3 @@ private:
   int8_t page_offset = 0;
   int8_t column_offset = 0;
 };
-
