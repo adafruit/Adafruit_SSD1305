@@ -337,3 +337,14 @@ void Adafruit_SSD1305::display(void) {
   window_x2 = -1;
   window_y2 = -1;
 }
+
+/*!
+    @brief  Put the display driver into a low power mode instead of just turning
+   off all pixels
+*/
+void Adafruit_SSD1305::sleep(void) { oled_command(SSD1305_DISPLAYOFF); }
+
+/*!
+    @brief  Wake the display driver from the low power mode
+*/
+void Adafruit_SSD1305::wake(void) { oled_command(SSD1305_DISPLAYON); }
