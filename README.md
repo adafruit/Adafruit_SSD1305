@@ -3,7 +3,7 @@
 This is the Adafruit SSD1305 Arduino Library for Arduino
 Tested and works great with the Adafruit SSD1305 Breakout Board
 
-[<img src="https://cdn-shop.adafruit.com/1200x900/4567-07.jpg" width="500px">](https://www.adafruit.com/?q=monochrome%20oled)
+[<img src="https://cdn-shop.adafruit.com/970x728/2719-03.jpg" width="500px">](https://www.adafruit.com/?q=monochrome%20oled)
 
 These displays use I2C or SPI to communicate
 
@@ -30,7 +30,7 @@ https://learn.adafruit.com/the-well-automated-arduino-library/doxygen
 https://learn.adafruit.com/the-well-automated-arduino-library/doxygen-tips
 
 ## Formatting and clang-format
-This library uses [`clang-format`](https://releases.llvm.org/download.html) to standardize the formatting of `.cpp` and `.h` files. 
+This library uses [`clang-format`](https://releases.llvm.org/download.html) to standardize the formatting of `.cpp` and `.h` files.
 Contributions should be formatted using `clang-format`:
 
 The `-i` flag will make the changes to the file.
